@@ -12,16 +12,16 @@ class InfoMessage:
                  calories: float
                  ) -> None:
         self.training_type = training_type
-        training.duration = duration
-        training.get_distance = distance
-        training.get_mean_speed = speed
+        self.duration = duration
+        self.get_distance = distance
+        self.get_mean_speed = speed
         self.calories = calories
 
     def get_message(self):
-        return (f'Тип тренировки: {self.training_type};'
-                f'Длительность: {training.duration:.3f} ч.;'
-                f'Дистанция: {training.get_distance:.3f} км;'
-                f'Ср. скорость: {training.get_mean_speed:.3f} км/ч;'
+        return (f'Тип тренировки: {self.training_type}; '
+                f'Длительность: {self.duration:.3f} ч.; '
+                f'Дистанция: {self.get_distance:.3f} км; '
+                f'Ср. скорость: {self.get_mean_speed:.3f} км/ч; '
                 f'Потрачено ккал: {self.calories:.3f}.')
 
 
@@ -88,7 +88,7 @@ class SportsWalking(Training):
 
     CALORIES_WEIGHT_MULTIPLIER = 0.035
     CALORIES_SPEED_HEIGHT_MULTIPLIER = 0.029
-    KMH_IN_MSEC = 1000 / 3600
+    KMH_IN_MSEC = 0.278
     CM_IN_M = 100
 
     def __init__(self,
