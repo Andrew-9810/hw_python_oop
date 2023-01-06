@@ -145,11 +145,10 @@ def read_package(workout_type: str, data: list) -> Training:
         'RUN': Running,
         'WLK': SportsWalking
     }
-    message: str = ('В функцию read_package передан неверный тип тренировки')
     try:
         type_class[workout_type](*data)
     except KeyError:
-        print(message)
+        return ('В функцию read_package передан неверный тип тренировки')
     return type_class[workout_type](*data)
 
 
