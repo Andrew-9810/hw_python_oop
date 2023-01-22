@@ -131,9 +131,6 @@ class Swimming(Training):
         return spent_calories
 
 
-Error_packages: str = ""
-
-
 def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
     type_class: dict[str, type[Training]] = {
@@ -141,38 +138,24 @@ def read_package(workout_type: str, data: list) -> Training:
         'RUN': Running,
         'WLK': SportsWalking
     }
-    try:
+    if workout_type in type_class:
         return type_class[workout_type](*data)
-    # Проверка правописания типа тренировки.
-    except KeyError:
-        global Error_packages
-        Error_packages = (f"Было введено неверное значение {workout_type}. "
-                          f"Разрешены слдующие значения: SWM; RUN; WLK")
-    # Проверка на количество значений в типе тренировки.
-    except TypeError:
-        Error_packages = (f"Неверно задано количество элементов значений,"
-                          f"Строка введеная вами: {workout_type}, {data}."
-                          f"Пример: "
-                          f"SWM [720, 1, 80, 25, 40], 5 элементов;"
-                          f"RUN [15000, 1, 75] 3 элемента;"
-                          f"WLK [9000, 1, 75, 180] 4 элемента;")
+    else:
+        raise KeyError(f'Было введено неверное значение {workout_type}. '
+                       f'Разрешены следующие значения: SWM; RUN; WLK.')
 
 
 def main(training: Training) -> None:
     """Главная функция."""
-    try:
-        into: InfoMessage = training.show_training_info()
-    except AttributeError:
-        print(Error_packages)
-    else:
-        print(into.get_message())
+    into: InfoMessage = training.show_training_info()
+    print(into.get_message())
 
 
 if __name__ == '__main__':
     packages = [
         ('SWM', [720, 1, 80, 25, 40]),
         ('RUN', [15000, 1, 75]),
-        ('WLK', [9000, 1, 75, 180])
+        ('WLL', [9000, 1, 75, 180])
     ]
 
     for workout_type, data in packages:
