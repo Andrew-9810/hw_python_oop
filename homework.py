@@ -1,26 +1,22 @@
 
-class InfoMessage:
+from dataclasses import dataclass, asdict
 
-    """Информационное сообщение о тренировке."""
-    def __init__(self,
-                 training_type: str,
-                 duration: float,
-                 distance: float,
-                 speed: float,
-                 calories: float
-                 ) -> None:
-        self.training_type = training_type
-        self.duration = duration
-        self.get_distance = distance
-        self.get_mean_speed = speed
-        self.calories = calories
+
+@dataclass
+class InfoMessage:
+    training_type: str
+    duration: float
+    distance: float
+    speed: float
+    calories: float
 
     def get_message(self):
-        return (f'Тип тренировки: {self.training_type}; '
-                f'Длительность: {self.duration:.3f} ч.; '
-                f'Дистанция: {self.get_distance:.3f} км; '
-                f'Ср. скорость: {self.get_mean_speed:.3f} км/ч; '
-                f'Потрачено ккал: {self.calories:.3f}.')
+        message = ('Тип тренировки: {training_type}; '
+                   'Длительность: {duration:.3f} ч.; '
+                   'Дистанция: {distance:.3f} км; '
+                   'Ср. скорость: {speed:.3f} км/ч; '
+                   'Потрачено ккал: {calories:.3f}.')
+        return message.format(**asdict(self))
 
 
 class Training:
@@ -68,9 +64,6 @@ class Running(Training):
 
     CALORIES_MEAN_SPEED_MULTIPLIER: int = 18
     CALORIES_MEAN_SPEED_SHIFT: float = 1.79
-
-    def __init__(self, action: int, duration: float, weight: float):
-        super().__init__(action, duration, weight)
 
     def get_spent_calories(self):
         spent_calories: float = ((self.CALORIES_MEAN_SPEED_MULTIPLIER
@@ -122,8 +115,8 @@ class Swimming(Training):
                  length_pool: int,
                  count_pool: int):
         super().__init__(action, duration, weight)
-        self.length_pool = length_pool
-        self.count_pool = count_pool
+        self.length_pool: int = length_pool
+        self.count_pool: int = count_pool
 
     def get_mean_speed(self):
         mean_speed = (self.length_pool
@@ -138,24 +131,41 @@ class Swimming(Training):
         return spent_calories
 
 
+Error_packages: str = ""
+
+
 def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
-    type_class: dict[str, Training] = {
+    type_class: dict[str, type[Training]] = {
         'SWM': Swimming,
         'RUN': Running,
         'WLK': SportsWalking
     }
     try:
-        type_class[workout_type](*data)
+        return type_class[workout_type](*data)
+    # Проверка правописания типа тренировки.
     except KeyError:
-        return ('В функцию read_package передан неверный тип тренировки')
-    return type_class[workout_type](*data)
+        global Error_packages
+        Error_packages = (f"Было введено неверное значение {workout_type}. "
+                          f"Разрешены слдующие значения: SWM; RUN; WLK")
+    # Проверка на количество значений в типе тренировки.
+    except TypeError:
+        Error_packages = (f"Неверно задано количество элементов значений,"
+                          f"Строка введеная вами: {workout_type}, {data}."
+                          f"Пример: "
+                          f"SWM [720, 1, 80, 25, 40], 5 элементов;"
+                          f"RUN [15000, 1, 75] 3 элемента;"
+                          f"WLK [9000, 1, 75, 180] 4 элемента;")
 
 
 def main(training: Training) -> None:
     """Главная функция."""
-    into: InfoMessage = training.show_training_info()
-    print(into.get_message())
+    try:
+        into: InfoMessage = training.show_training_info()
+    except AttributeError:
+        print(Error_packages)
+    else:
+        print(into.get_message())
 
 
 if __name__ == '__main__':
